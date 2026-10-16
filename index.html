@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veil — Privacy Intelligence Studio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{--bg:#f4f5f0;--paper:#fffefa;--ink:#17221d;--muted:#737e76;--line:#dfe5dc;--green:#c8fa63;--green-dark:#294a22;--purple:#8a70ff;--shadow:0 20px 60px #24362912}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif;min-height:100vh}
+button,textarea,input,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:1500px;margin:auto;padding:20px clamp(14px,3vw,42px) 30px}
+
+/* NAV */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0 26px;gap:15px}
+.brand{display:flex;align-items:center;gap:11px;font-size:21px;font-weight:800;letter-spacing:-1px}
+.brand-mark{width:40px;height:40px;background:var(--ink);color:var(--green);border-radius:13px;display:grid;place-items:center;font-size:23px;box-shadow:5px 5px 0 var(--green)}
+.brand em{font-style:normal;color:var(--muted);font-weight:500}
+.top-right{display:flex;gap:10px;align-items:center}
+.status{border:1px solid #cbd9c5;background:#e8f5df;border-radius:100px;padding:9px 13px;font:11px 'DM Mono',monospace;color:#315c32;display:flex;align-items:center;gap:8px}
+.pulse{width:7px;height:7px;border-radius:50%;background:#3da856;box-shadow:0 0 0 4px #3da85620}
+.tag{font:10px 'DM Mono',monospace;color:var(--muted);letter-spacing:1px}
+
+/* HERO */
+.hero{background:var(--ink);border-radius:25px;color:#fffefa;padding:clamp(24px,4vw,50px);display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:center;position:relative;overflow:hidden;isolation:isolate}
+.hero:before{content:"";position:absolute;width:390px;height:390px;border:1px solid #ffffff13;border-radius:50%;right:-80px;top:-180px;box-shadow:0 0 0 38px #ffffff08,0 0 0 78px #ffffff05;z-index:-1}
+.hero:after{content:"";position:absolute;width:190px;height:190px;background:var(--green);border-radius:50%;right:19%;bottom:-160px;opacity:.9;z-index:-1}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;color:var(--green);font:10px 'DM Mono',monospace;letter-spacing:1.6px;text-transform:uppercase}
+.eyebrow b{color:var(--ink);background:var(--green);padding:4px 7px;border-radius:5px}
+h1{font-size:clamp(39px,6vw,76px);line-height:.99;letter-spacing:-4px;margin:21px 0 17px;font-weight:800}
+h1 span{color:var(--green)}
+.hero p{max-width:580px;color:#bdc7be;line-height:1.75;font-size:14px;margin:0}
+.hero-visual{min-height:215px;position:relative;display:grid;place-items:center}
+.orbit{width:210px;height:210px;border:1px solid #ffffff2b;border-radius:50%;display:grid;place-items:center;position:relative;animation:float 6s ease-in-out infinite}
+.orbit:before,.orbit:after{content:"";position:absolute;border:1px dashed #ffffff35;border-radius:50%;inset:19px}
+.orbit:after{inset:43px;border-style:solid}
+.shield{width:92px;height:105px;background:var(--green);color:var(--ink);clip-path:polygon(50% 0,92% 17%,86% 65%,50% 100%,14% 65%,8% 17%);display:grid;place-items:center;font-size:36px}
+.float-chip{position:absolute;background:#fffefa;color:var(--ink);padding:10px 13px;border-radius:10px;font:10px 'DM Mono',monospace;box-shadow:0 8px 30px #0002}
+.chip1{top:14px;right:0}
+.chip2{bottom:20px;left:0}
+.chip3{bottom:3px;right:8px;background:var(--purple);color:#fff}
+@keyframes float{50%{transform:translateY(-7px) rotate(2deg)}}
+
+/* METRICS */
+.metric-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 22px}
+.metric{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:17px 19px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 18px #24362905}
+.metric-icon{width:39px;height:39px;border-radius:12px;background:#eff5e7;display:grid;place-items:center;font-size:18px}
+.metric strong{display:block;font-size:23px;letter-spacing:-1px}
+.metric span{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,.82fr);gap:15px;align-items:start}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);min-width:0}
+.card-head{padding:19px 21px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);gap:12px}
+.head-left{display:flex;align-items:center;gap:11px}
+.number{width:33px;height:33px;border-radius:10px;background:var(--green);display:grid;place-items:center;font:12px 'DM Mono',monospace}
+.card-title{font-size:14px;font-weight:800}
+.card-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.card-body{padding:19px 21px}
+.label-row{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+.label{font:10px 'DM Mono',monospace;letter-spacing:1px;color:var(--muted)}
+.linkbtn{border:0;background:transparent;color:#556b47;font-size:11px;font-weight:800;padding:5px}
+.linkbtn:hover{color:#17221d}
+
+/* EDITOR */
+textarea{width:100%;min-height:285px;resize:vertical;border:1px solid #dce4d9;border-radius:14px;background:#f8faf5;padding:17px;color:#29382f;outline:none;line-height:1.8;font-size:12px;transition:.2s}
+textarea:focus{border-color:#9cce5b;box-shadow:0 0 0 4px #c8fa632b}
+textarea::placeholder{color:#a0aaa0}
+.editor-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:11px 0 17px;font:10px 'DM Mono',monospace;color:var(--muted);flex-wrap:wrap}
+.filebtn{cursor:pointer;color:#4d6742;font-weight:700}
+.filebtn input{display:none}
+
+/* BUTTONS */
+.btnrow{display:flex;gap:9px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);border-radius:10px;background:#fffefa;color:var(--ink);padding:11px 14px;font-size:11px;font-weight:800;transition:.18s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 7px 18px #24362912}
+.btn.main{background:var(--green);border-color:var(--green);color:#1a2a16}
+.btn.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.wide{flex:1}
+select{font-size:11px;font-weight:800;border:1px solid var(--line);border-radius:10px;background:#fffefa;padding:11px 12px;color:var(--ink)}
+
+/* PRIVACY NOTE */
+.privacy{margin-top:17px;padding:13px 14px;background:#eff7e8;border:1px solid #d6e8c8;border-radius:12px;display:flex;gap:10px;color:#496047;font-size:10px;line-height:1.6}
+.privacy strong{color:#294a22}
+
+/* RULES */
+.rulegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.rule{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;min-width:0;transition:.15s}
+.rule:hover{border-color:#9dbd8a}
+.rule input{accent-color:#4d7c2f;width:14px;height:14px;margin:0;flex:none}
+.swatch{width:8px;height:8px;border-radius:3px;flex:none}
+.rule span{font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.sectionline{height:1px;background:var(--line);margin:19px 0}
+
+/* PREVIEW */
+.preview-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.preview-head strong{font-size:12px}
+.live{font:9px 'DM Mono',monospace;color:#467542;background:#eaf5e4;border-radius:6px;padding:6px 8px}
+.preview{min-height:175px;max-height:360px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid #e1e6dd;border-radius:13px;background:#f8faf5;padding:15px;line-height:2;font-size:11px;color:#344138}
+.empty{color:#9ca79b}
+.hit{display:inline-block;padding:1px 4px;border-radius:5px;cursor:pointer;border-bottom:2px solid currentColor;line-height:1.7;margin:0 1px}
+.hit:after{content:attr(data-type);display:block;font:8px 'DM Mono',monospace;line-height:1.1;text-transform:uppercase}
+.hit.ignored{opacity:.35;text-decoration:line-through}
+.hit.email{background:#ddf5ff;color:#17647d}
+.hit.phone{background:#d9f8e8;color:#226a4b}
+.hit.aadhaar{background:#fff0cb;color:#8b5c08}
+.hit.pan{background:#ffe0e7;color:#9a3550}
+.hit.pin{background:#e9e1ff;color:#5b45a8}
+.hit.dob{background:#ffe4d5;color:#99502e}
+.hit.name{background:#e2e9f5;color:#3d5685}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 14px;font-size:9px;color:var(--muted)}
+.legend span{display:flex;gap:5px;align-items:center}
+.legend i{width:7px;height:7px;border-radius:2px}
+
+/* REPORT TABLE */
+.summary{width:100%;border-collapse:collapse;font-size:10px}
+.summary th{text-align:left;color:var(--muted);font:9px 'DM Mono',monospace;letter-spacing:.5px;padding:9px 7px;border-bottom:1px solid var(--line)}
+.summary td{padding:10px 7px;border-bottom:1px solid #edf0e9}
+.summary tr:last-child td{border-bottom:0}
+.summary td:last-child{text-align:right;font-weight:800}
+.typecell{display:flex;gap:8px;align-items:center}
+.summary .mask{font:9px 'DM Mono',monospace;color:var(--muted)}
+.summary .count{font:12px 'DM Mono',monospace}
+.summary tr:hover{background:#f7f9f3}
+
+/* FOOTER + TOAST */
+.footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:21px 3px 0;color:#7f8a7f;font:9px 'DM Mono',monospace}
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,18px);opacity:0;pointer-events:none;background:var(--ink);color:var(--green);padding:13px 18px;border-radius:12px;font-size:11px;font-weight:800;box-shadow:var(--shadow);transition:.25s;z-index:5}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* RESPONSIVE */
+@media(max-width:1000px){.layout{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.hero-visual{display:none}.metric-strip{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.app{padding:12px}.topbar{padding-bottom:17px}.top-right .tag{display:none}.status{font-size:9px;padding:8px}.hero{padding:25px 20px;border-radius:19px}h1{letter-spacing:-2.5px}.metric{padding:12px}.metric strong{font-size:19px}.card-head,.card-body{padding:15px}.rulegrid{grid-template-columns:1fr 1fr}textarea{min-height:230px}.btn{padding:10px 11px}.card{border-radius:16px}}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header class="topbar">
+    <div class="brand">
+        <div class="brand-mark">◈</div>
+        <div>veil <em>/ privacy studio</em></div>
+    </div>
+    <div class="top-right">
+        <span class="tag">PERSONAL DATA DEFENCE SYSTEM</span>
+        <div class="status"><i class="pulse"></i>LOCAL MODE ACTIVE</div>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <div>
+        <div class="eyebrow"><b>V.02</b> DIGITAL PRIVACY, REIMAGINED</div>
+        <h1>Your data.<br>Your rules.<br><span>Your control.</span></h1>
+        <p>A privacy-first workspace that finds sensitive details before they travel. Scan messy text, inspect every match, and export a cleaner version — all on your device.</p>
+    </div>
+    <div class="hero-visual">
+        <div class="orbit">
+            <div class="shield">✳</div>
+            <div class="float-chip chip1">✦ PRIVACY PROTECTED</div>
+            <div class="float-chip chip2">◉ LOCAL SCAN</div>
+            <div class="float-chip chip3">PRIVACY FIRST</div>
+        </div>
+    </div>
+</section>
+
+<!-- METRICS -->
+<section class="metric-strip">
+    <div class="metric"><div class="metric-icon">⌕</div><div><strong id="mFound">0</strong><span>Active detections</span></div></div>
+    <div class="metric"><div class="metric-icon">◌</div><div><strong id="mTypes">0</strong><span>Data types found</span></div></div>
+    <div class="metric"><div class="metric-icon">↗</div><div><strong id="mIgnored">0</strong><span>Ignored by you</span></div></div>
+    <div class="metric"><div class="metric-icon">◈</div><div><strong id="mProtected">0%</strong><span>Text masked*</span></div></div>
+</section>
+
+<!-- WORKSPACE -->
+<main class="layout">
+
+<!-- INPUT -->
+<section class="card">
+    <div class="card-head">
+        <div class="head-left">
+            <div class="number">01</div>
+            <div>
+                <div class="card-title">Drop your text here</div>
+                <div class="card-sub">Paste a chat, document, email or log file</div>
+            </div>
+        </div>
+        <span class="tag" id="chars">0 CHARS</span>
+    </div>
+
+    <div class="card-body">
+        <div class="label-row">
+            <span class="label">SOURCE DOCUMENT</span>
+            <div>
+                <button class="linkbtn" id="demo">↳ Try live demo</button>
+                <button class="linkbtn" id="clear">Clear ×</button>
+            </div>
+        </div>
+
+        <textarea id="source" spellcheck="false" placeholder="Paste your text here...
+
+Example: Please contact me at alex@example.com or +91 98765 43210."></textarea>
+
+        <div class="editor-meta">
+            <span id="words">0 WORDS</span>
+            <label class="filebtn">＋ Import .TXT / .CSV<input id="file" type="file" accept=".txt,.csv,text/plain,text/csv"></label>
+        </div>
+
+        <div class="btnrow">
+            <button class="btn main" id="scan">✦ Scan sensitive data</button>
+            <button class="btn" id="reset">Reset ignored matches</button>
+            <select id="style" title="Mask style">
+                <option value="label">Mask: [PHONE]</option>
+                <option value="partial">Mask: partial (…1234)</option>
+                <option value="pseudo">Mask: pseudonyms [EMAIL_1]</option>
+            </select>
+        </div>
+
+        <div class="privacy">
+            <span style="font-size:17px">◈</span>
+            <div><strong>Local by design.</strong> Your pasted text is processed in this browser only. It is not uploaded by this tool. Detection is pattern-based, so always review the result before sharing.</div>
+        </div>
+    </div>
+</section>
+
+<!-- RESULTS -->
+<section class="card">
+    <div class="card-head">
+        <div class="head-left">
+            <div class="number">02</div>
+            <div>
+                <div class="card-title">Privacy review</div>
+                <div class="card-sub">Review matches before you export</div>
+            </div>
+        </div>
+        <span class="live" id="state">AWAITING SCAN</span>
+    </div>
+
+    <div class="card-body">
+        <div class="label-row">
+            <span class="label">DETECTION RULES</span>
+            <button class="linkbtn" id="toggleAll">Toggle all</button>
+        </div>
+
+        <div class="rulegrid" id="rules"></div>
+
+        <div class="sectionline"></div>
+
+        <div class="preview-head">
+            <strong>Annotated source</strong>
+            <span class="tag">CLICK A MATCH TO IGNORE</span>
+        </div>
+        <div class="preview" id="preview"><span class="empty">Your text will appear here with sensitive matches highlighted.</span></div>
+
+        <div class="legend">
+            <span><i style="background:#17647d"></i>Email</span>
+            <span><i style="background:#226a4b"></i>Phone</span>
+            <span><i style="background:#8b5c08"></i>Aadhaar</span>
+            <span><i style="background:#9a3550"></i>PAN</span>
+            <span><i style="background:#5b45a8"></i>PIN</span>
+            <span><i style="background:#99502e"></i>DOB</span>
+        </div>
+
+        <div class="sectionline"></div>
+
+        <div class="preview-head">
+            <strong>Redacted output</strong>
+            <span class="tag">WHAT YOU WILL SHARE</span>
+        </div>
+        <div class="preview" id="output" style="line-height:1.8"></div>
+
+        <div class="sectionline"></div>
+
+        <div class="preview-head">
+            <strong>Redaction report</strong>
+            <span class="tag">LIVE SUMMARY</span>
+        </div>
+        <table class="summary">
+            <thead><tr><th>DATA TYPE</th><th>REPLACEMENT</th><th>COUNT</th></tr></thead>
+            <tbody id="summary"></tbody>
+        </table>
+
+        <div class="btnrow" style="margin-top:16px">
+            <button class="btn dark wide" id="copy">▣ Copy safe text</button>
+            <button class="btn main wide" id="download">↓ Export .TXT</button>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<footer class="footer">
+    <span>VEIL PRIVACY STUDIO · BUILT FOR SAFER SHARING</span>
+    <span>*Share of characters replaced by masks, not a guarantee that all personal data was found.</span>
+</footer>
+
+</div>
+
+<div class="toast" id="toast">Done</div>
+
+<script>
+/* ---------- Verhoeff checksum (Aadhaar) ---------- */
+const VD=[[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],[2,3,4,0,1,7,8,9,5,6],[3,4,0,1,2,8,9,5,6,7],[4,0,1,2,3,9,5,6,7,8],[5,9,8,7,6,0,4,3,2,1],[6,5,9,8,7,1,0,4,3,2],[7,6,5,9,8,2,1,0,4,3],[8,7,6,5,9,3,2,1,0,4],[9,8,7,6,5,4,3,2,1,0]];
+const VP=[[0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],[5,8,0,3,7,9,6,1,4,2],[8,9,1,6,0,4,3,5,2,7],[9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],[2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]];
+const VI=[0,4,3,2,1,5,6,7,8,9];
+const vValid=s=>{let c=0;s.split('').reverse().forEach((n,i)=>{c=VD[c][VP[i%8][+n]]});return c===0};
+const vGen=s=>{let c=0;s.split('').reverse().forEach((n,i)=>{c=VD[c][VP[(i+1)%8][+n]]});return String(VI[c])};
+
+/* ---------- Rules ---------- */
+const NAMES=['Aarav','Aditi','Ananya','Arjun','Ishaan','Kavya','Priya','Rahul','Rohan','Sneha','Vaibhavi','Vikram','Amit','Pooja','Neha','Rohit','Anjali','Suresh','Rajesh','Meera','Sanjay'];
+const RULES=[
+ {id:'email',label:'Email addresses',mask:'[EMAIL]',ex:'xxxxxx@domain',color:'#38a8d2',on:true},
+ {id:'phone',label:'Indian mobile numbers',mask:'[PHONE]',ex:'XXXXXX3210',color:'#36a86c',on:true},
+ {id:'aadhaar',label:'Aadhaar (Verhoeff-checked)',mask:'[AADHAAR]',ex:'XXXX XXXX 1234',color:'#d69b23',on:true},
+ {id:'pan',label:'PAN numbers',mask:'[PAN]',ex:'XXXXXX234F',color:'#e76c88',on:true},
+ {id:'pin',label:'PIN codes (contextual)',mask:'[PIN]',ex:'XX1001',color:'#8a70ff',on:true},
+ {id:'dob',label:'Dates of birth (contextual)',mask:'[DOB]',ex:'XX/XX/2004',color:'#e58c55',on:true},
+ {id:'name',label:'Common Indian names (beta)',mask:'[NAME]',ex:'R****',color:'#6c8bc2',on:false}
+];
+const PRIORITY=['email','aadhaar','pan','phone','dob','pin','name'];
+const $=id=>document.getElementById(id);
+let matches=[],ignored=new Set(),textNow='';
+
+/* sample: look-alike invoice numbers are forced to FAIL the checksum */
+const breakIt=n=>{while(vValid(n))n=n.slice(0,11)+((+n[11]+1)%10);return n};
+const sampleText=()=>{
+  const b='23456789012',aad=(b+vGen(b)).replace(/(\d{4})(\d{4})(\d{4})/,'$1 $2 $3');
+  return `Hi team,
+
+Please send the report to vaibhavi.k@example.com or call me at +91 98765 43210.
+Alternate numbers: 098765-43210, 9876543210 and 987 654 3210.
+For verification, Aadhaar: ${aad} and PAN: ABCDE1234F.
+The office PIN is 411001. Date of birth: 14/08/2004.
+
+Invoices (NOT personal data): ${breakIt('912345678901')}, ${breakIt('587654321098')}, dated 05/10/2026.
+Ref code 431005 is not a PIN.
+
+Thanks, Rahul`;
+};
+
+const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function buildRules(){
+  $('rules').innerHTML=RULES.map(r=>`<label class="rule"><input type="checkbox" data-id="${r.id}" ${r.on?'checked':''}><i class="swatch" style="background:${r.color}"></i><span>${r.label}</span></label>`).join('');
+  $('rules').querySelectorAll('input').forEach(i=>i.addEventListener('change',()=>{RULES.find(r=>r.id===i.dataset.id).on=i.checked;scan()}));
+}
+
+/* ---------- Detection ---------- */
+function detect(s){
+  const a=[],on=id=>RULES.find(r=>r.id===id).on;
+  const add=(type,re,ok=()=>true)=>{
+    re.lastIndex=0;let m;
+    while((m=re.exec(s))){
+      if(!m[0].length){re.lastIndex++;continue}
+      if(ok(m[0]))a.push({type,start:m.index,end:m.index+m[0].length,value:m[0]});
+    }
+  };
+  if(on('email'))add('email',/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g);
+  if(on('aadhaar'))add('aadhaar',/(?<![\d-])[2-9]\d{3}([ -]?)\d{4}\1\d{4}(?!\d)/g,v=>vValid(v.replace(/\D/g,'')));
+  if(on('pan'))add('pan',/(?<![A-Za-z0-9])[A-Z]{3}[ABCFGHLJPTK][A-Z]\d{4}[A-Z](?![A-Za-z0-9])/g);
+  if(on('phone'))add('phone',/(?<![\d+])(?:(?:\+|00)?91[ .-]?|0)?[6-9](?:[ .-]?\d){9}(?!\d)/g,v=>{
+    let d=v.replace(/\D/g,'');
+    if(d.length===14&&d.startsWith('0091'))d=d.slice(4);
+    else if(d.length===12&&d.startsWith('91'))d=d.slice(2);
+    else if(d.length===11&&d[0]==='0')d=d.slice(1);
+    return d.length===10&&/^[6-9]/.test(d);
+  });
+  if(on('dob'))add('dob',/(?<=\b(?:d\.?o\.?b\.?|date\s+of\s+birth|birth\s*date|birthday|born(?:\s+on)?)\s*[:\-–]?\s*)(?:(?:0?[1-9]|[12]\d|3[01])[\/.-](?:0?[1-9]|1[0-2])[\/.-](?:19|20)\d{2}|(?:19|20)\d{2}[\/.-](?:0?[1-9]|1[0-2])[\/.-](?:0?[1-9]|[12]\d|3[01]))(?!\d)/gi);
+  if(on('pin'))add('pin',/(?<=\b(?:pin(?:\s?code)?|post(?:al)?\s?code|zip(?:\s?code)?)\s*(?:is\s*|[:#-]\s*)?)[1-9]\d{2}\s?\d{3}(?!\d)/gi);
+  if(on('name'))add('name',new RegExp('\\b(?:'+NAMES.join('|')+')\\b','gi'));
+
+  /* overlaps: higher-priority type wins, then longer match */
+  a.sort((x,y)=>PRIORITY.indexOf(x.type)-PRIORITY.indexOf(y.type)||(y.end-y.start)-(x.end-x.start)||x.start-y.start);
+  const clean=[];
+  for(const m of a)if(!clean.some(x=>m.start<x.end&&m.end>x.start))clean.push(m);
+  clean.sort((x,y)=>x.start-y.start);
+  clean.forEach(m=>m.key=m.type+'|'+m.value.toLowerCase());
+  return clean;
+}
+
+/* ---------- Masking ---------- */
+function maskOf(m,pm){
+  const r=RULES.find(x=>x.id===m.type),style=$('style').value,v=m.value;
+  if(style==='pseudo'){
+    if(!pm.map[m.key]){pm.cnt[m.type]=(pm.cnt[m.type]||0)+1;pm.map[m.key]=`[${m.type.toUpperCase()}_${pm.cnt[m.type]}]`}
+    return pm.map[m.key];
+  }
+  if(style==='partial'){
+    if(m.type==='email'){const[u,d]=v.split('@');return 'x'.repeat(Math.min(u.length,6))+'@'+d}
+    if(m.type==='name')return v[0]+'*'.repeat(v.length-1);
+    let n=0;
+    return [...v].reverse().map(c=>/[A-Za-z0-9]/.test(c)?(++n<=4?c:'X'):c).reverse().join('');
+  }
+  return r.mask;
+}
+function redacted(){
+  const pm={map:{},cnt:{}};let out='',p=0;
+  for(const m of matches){
+    if(ignored.has(m.key))continue;
+    out+=textNow.slice(p,m.start)+maskOf(m,pm);p=m.end;
+  }
+  return out+textNow.slice(p);
+}
+
+/* ---------- Scan + render ---------- */
+function scan(){
+  textNow=$('source').value;
+  $('chars').textContent=textNow.length+' CHARS';
+  $('words').textContent=(textNow.trim()?textNow.trim().split(/\s+/).length:0)+' WORDS';
+  matches=detect(textNow);
+  render();
+}
+function render(){
+  const isIg=m=>ignored.has(m.key),active=matches.filter(m=>!isIg(m));
+  let h='',p=0;
+  for(const m of matches){
+    const ig=isIg(m);
+    h+=esc(textNow.slice(p,m.start))+`<span class="hit ${m.type}${ig?' ignored':''}" data-key="${esc(m.key)}" data-type="${ig?'IGNORED':m.type.toUpperCase()}" title="Click to ${ig?'include':'ignore'} this match (all identical values)">${esc(m.value)}</span>`;
+    p=m.end;
+  }
+  h+=esc(textNow.slice(p));
+  $('preview').innerHTML=textNow?h:'<span class="empty">Your text will appear here with sensitive matches highlighted.</span>';
+  $('preview').querySelectorAll('.hit').forEach(el=>el.onclick=()=>{
+    const k=el.dataset.key;ignored.has(k)?ignored.delete(k):ignored.add(k);render();
+  });
+  $('output').innerHTML=textNow?esc(redacted()):'<span class="empty">The redacted text will appear here.</span>';
+
+  const maskedChars=active.reduce((n,m)=>n+m.value.length,0);
+  $('mFound').textContent=active.length;
+  $('mTypes').textContent=new Set(active.map(m=>m.type)).size;
+  $('mIgnored').textContent=matches.filter(isIg).length;
+  $('mProtected').textContent=textNow.length?Math.round(maskedChars/textNow.length*100)+'%':'0%';
+  $('state').textContent=textNow?(active.length?'REVIEW MATCHES':'NO MATCHES'):'AWAITING SCAN';
+
+  const style=$('style').value;
+  $('summary').innerHTML=RULES.map(r=>{
+    const ex=style==='label'?r.mask:style==='pseudo'?`[${r.id.toUpperCase()}_1]`:r.ex;
+    return `<tr><td><span class="typecell"><i class="swatch" style="background:${r.color}"></i>${r.label.replace(' (beta)','')}${r.on?'':' (off)'}</span></td><td class="mask">${ex}</td><td class="count">${active.filter(m=>m.type===r.id).length}</td></tr>`;
+  }).join('');
+}
+
+function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2100)}
+const loadText=t=>{$('source').value=t;ignored.clear();scan()};
+
+/* ---------- Events ---------- */
+$('source').addEventListener('input',scan);
+$('style').addEventListener('change',render);
+$('scan').onclick=()=>{scan();toast('Scan complete — review every match')};
+$('demo').onclick=()=>{loadText(sampleText());toast('Demo loaded — click a highlight to ignore it')};
+$('clear').onclick=()=>loadText('');
+$('reset').onclick=()=>{ignored.clear();render();toast('Ignored matches reset')};
+$('toggleAll').onclick=()=>{const all=RULES.every(r=>r.on);RULES.forEach(r=>r.on=!all);buildRules();scan()};
+$('copy').onclick=async()=>{
+  try{await navigator.clipboard.writeText(redacted())}
+  catch(e){const t=document.createElement('textarea');t.value=redacted();document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}
+  toast('Redacted text copied');
+};
+$('download').onclick=()=>{
+  const a=document.createElement('a'),u=URL.createObjectURL(new Blob([redacted()],{type:'text/plain;charset=utf-8'}));
+  a.href=u;a.download='veil-redacted.txt';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
+  toast('Export downloaded');
+};
+$('file').onchange=async e=>{const f=e.target.files[0];if(f){loadText(await f.text());toast('File imported locally');e.target.value=''}};
+
+buildRules();
+scan();
+</script>
+</body>
+</html>
+ 
